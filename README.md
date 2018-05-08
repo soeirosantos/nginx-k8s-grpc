@@ -34,7 +34,7 @@ $ gcloud components install kubectl
 $ export MY_REGION=us-east1 \
 export MY_ZONE=us-east1-b \
 export CLUSTER_NAME=cluster_name \
-export PROJECT_ID=project_id #this ID must be the same as your project on GCP
+export PROJECT_ID=project_id \ #this ID must be the same as your project on GCP
 export SERVICE_ACCOUNT=service-account #for the purpose of this guide it could be the email address you use to access GCP
 ```
 
@@ -52,9 +52,7 @@ gcloud config set compute/zone $MY_ZONE
 $ gcloud config list
 ```
 
-* Create the cluster
-
-If it's the first time you are using GKE in this project ID then you'll need to activate "Kubernetes Engine API"
+* Create the cluster (If it's the first time you are using GKE in this project ID then you'll need to activate "Kubernetes Engine API")
 
 ```bash
 $ gcloud container clusters create $CLUSTER_NAME --num-nodes 3
@@ -72,6 +70,8 @@ $ gcloud container clusters get-credentials $CLUSTER_NAME --zone $MY_ZONE --proj
 $ git clone https://github.com/soeirosantos/nginx-k8s-grpc.git | cd nginx-k8s-grpc
 ```
 
+* Create a service account, a secret with the certificate and configure nginx to use HTTP2
+
 ```bash
 $ kubectl apply -f ./ingress-install/common/ns-and-sa.yaml
 $ kubectl apply -f ./ingress-install/common/default-server-secret.yaml # self signed certificate
@@ -83,6 +83,8 @@ $ kubectl apply -f ./ingress-install/common/nginx-config.yaml # http2: True
 ```bash
 $ kubectl create clusterrolebinding $SERVICE_ACCOUNT-cluster-admin-binding --clusterrole=cluster-admin --user=$SERVICE_ACCOUNT
 ```
+
+* And then configure the roles to the nginx-ingress service account
 
 ```bash
 $ kubectl apply -f ./ingress-install/rbac/rbac.yaml
@@ -121,7 +123,7 @@ $ kubectl create -f grpc-hello.yaml
 $ kubectl create -f grpc-ingress-tls.yaml
 ```
 
-* Now run the golang gRPC client to test the configuration
+* Run the golang gRPC client to test the configuration
 
 ```bash
 $ go run grpc/greeter_client/main.go
