@@ -5,3 +5,4 @@ metadata:
   namespace: nginx-ingress
 data:
   http2: "True"
+  lb-method: "round_robin"
